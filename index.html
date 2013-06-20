@@ -1,0 +1,41 @@
+<html>
+<head>
+	<title>Testing Web Storage</title>
+	<script>
+		function saveName()
+		{
+			var fname = document.getElementById("fname").value;
+			var lname = document.getElementById("lname").value;
+			localStorage.setItem('fname', fname);
+			localStorage.setItem('lname', lname);
+		};
+
+		function displayName()
+		{
+			for (var i = 0; i < localStorage.length; i++) {
+				var keyName = localStorage.key(i);
+				var value = localStorage.getItem(keyName);
+				document.writeln(keyName + ': ' + value);
+			}
+		};
+		function resetStorage()
+		{
+			localStorage.clear();
+		};
+	</script>
+</head>
+<body>
+	<h1>Testing Web Storage</h1>
+	<h2>Add name</h2>
+	<form>
+		<label for="fname">First Name: </label>
+		<input type="text" id="fname"><br>
+		<label for="lname">Last Name: </label>
+		<input type="text" id="lname"><br>
+		<input type="button" value="Save" onclick="saveName();">
+	</form>
+
+	<button onclick="displayName();">Display Name</button>
+	<button onclick="resetStorage();">Reset</button>
+</body>
+</html>
