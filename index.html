@@ -1,41 +1,127 @@
 <html>
 <head>
 	<title>Testing Web Storage</title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 	<script>
+		jQuery(function()
+		{
+			displayName();
+			$("#editform").hide();
+		});
+
 		function saveName()
 		{
-			var fname = document.getElementById("fname").value;
-			var lname = document.getElementById("lname").value;
-			localStorage.setItem('fname', fname);
-			localStorage.setItem('lname', lname);
+			var input = document.forms.recordinput;
+			var fname = input.elements.fname.value;
+			var lname = input.elements.lname.value;
+
+			var record = {
+				fname: fname,
+				lname: lname,
+			};
+
+			var idCountStr = localStorage.getItem("idCount");
+			if (idCountStr) {
+				var idCountInt = parseInt(idCountStr) + 1;
+			} else {
+				var idCountInt = 0;
+			}
+
+			localStorage.setItem(idCountInt.toString(), JSON.stringify(record));
+			localStorage.setItem("idCount", idCountInt);
+
+
+			displayName();
 		};
 
-		function displayName()
-		{
-			for (var i = 0; i < localStorage.length; i++) {
-				var keyName = localStorage.key(i);
-				var value = localStorage.getItem(keyName);
-				document.writeln(keyName + ': ' + value);
-			}
-		};
 		function resetStorage()
 		{
 			localStorage.clear();
+			displayName();
 		};
+
+
+		function displayName()
+		{
+			var $list = $("ul");
+			$list.empty();
+			for (var i = 0; i < localStorage.length; i++) {
+				var keyName = localStorage.key(i);
+				if (keyName != 'idCount') {
+					var value = localStorage.getItem(keyName);
+					var nameOb = JSON.parse(value);
+					$("<li data-id=" + keyName + ">" + nameOb.fname + " " + nameOb.lname + "</li>").appendTo($list);
+				}
+			}
+
+			displayDelButton();
+		};
+
+		function displayDelButton()
+		{
+			$("li").each(function(){
+				var $id = $(this).data('id')
+				$(this).append($("<button onclick='editName(" + $id + ");'>edit</button>"))
+						.append($("<button onclick='deleteName(" + $id + ");'>delete</button>"));
+			});
+		}
+
+		function deleteName(id)
+		{
+			localStorage.removeItem(id);
+			displayName();
+		};
+
+		function editName(id)
+		{
+			$("#editform").show();
+			var record = localStorage.getItem(id);
+			var nameOb = JSON.parse(record);
+			$("#fname_edit").val(nameOb.fname);
+			$("#lname_edit").val(nameOb.lname);
+
+			$("form[name='recordedit']").on('click', 'BUTTON', function(){
+				var $fname_new = $("#fname_edit").val();
+				var $lname_new = $("#lname_edit").val();
+
+				var record = {
+				fname: $fname_new,
+				lname: $lname_new,
+				};
+				localStorage.setItem(id, JSON.stringify(record));
+			});
+		};
+
+
 	</script>
 </head>
 <body>
 	<h1>Testing Web Storage</h1>
-	<h2>Add name</h2>
-	<form>
+	<h2>Enter name:</h2>
+	<form name="recordinput">
 		<label for="fname">First Name: </label>
 		<input type="text" id="fname"><br>
 		<label for="lname">Last Name: </label>
 		<input type="text" id="lname"><br>
-		<input type="button" value="Save" onclick="saveName();">
+		<input name="save" type="button" value="Save" onclick="saveName();">
 	</form>
 
-	<button onclick="displayName();">Display Name</button>
+
+	<h2>Saved names</h2>
+	<ul>
+	</ul>
+
+	<div id="editform">
+		<h2>Edit name:</h2>
+		<form name="recordedit">
+			<label for="fname">First Name: </label>
+			<input type="text" id="fname_edit"><br>
+			<label for="lname">Last Name: </label>
+			<input type="text" id="lname_edit"><br>
+			<button>save edit</button>
+		</form>
+	</div>
+
 	<button onclick="resetStorage();">Reset</button>
 </body>
 </html>
