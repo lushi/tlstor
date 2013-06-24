@@ -11,9 +11,8 @@
 
 		function saveName()
 		{
-			var input = document.forms.recordinput;
-			var fname = input.elements.fname.value;
-			var lname = input.elements.lname.value;
+			var fname = $("#fname").val();
+			var lname = $("#lname").val();
 
 			var record = {
 				fname: fname,
