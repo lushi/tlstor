@@ -1,0 +1,151 @@
+<!-- Old index file, kept for reference -->
+
+<html>
+<head>
+	<title>Testing Web Storage</title>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script type="text/javascript" src="js/TLStor.Record.js"></script>
+	<script type="text/javascript">
+	// $().ready(function(){
+	// 	var app = new TLStor.App($('#container'));
+	// 	app.createRecord;
+	// });
+
+		jQuery(function()
+		{
+			createRecord();
+			displayRecord();
+			$("#editform").hide();
+		});
+
+		function createRecord()
+		{
+			$("form[name='recordinput']").on('click', 'BUTTON', function(){
+				var $fname = $("#fname").val();
+				var $lname = $("#lname").val();
+				var idx = _incrIdCount();
+
+				var newRec = new Record(idx, $fname, $lname);
+				localStorage.setItem(newRec.id, JSON.stringify(newRec));
+			});
+		};
+
+		function _incrIdCount()
+		{
+			var idCount = localStorage.getItem("idCount");
+			var idx = idCount ? (parseInt(idCount) + 1) : 0;
+			localStorage.setItem("idCount", idx);
+			return idx;
+		};
+
+		function updateRecord(id)
+		{
+			$("#editform").show();
+			var value = localStorage.getItem(id);
+			var record = JSON.parse(value);
+			$("#fnameUpdate").val(record.fname);
+			$("#lnameUpdate").val(record.lname);
+
+			$("form[name='recordedit']").on('click', 'BUTTON', function(){
+				var $fnameUpdate = $("#fnameUpdate").val();
+				var $lnameUpdate = $("#lnameUpdate").val();
+				record.update(fnameUpdate, lnameUpdate);
+				localStorage.setItem(id, JSON.stringify(record));
+			});
+		};
+
+		// function resetStorage()
+		// {
+		// 	localStorage.clear();
+		// 	displayRecord();
+		// };
+
+
+		function displayRecord()
+		{
+			var $list = $("ul");
+			$list.empty();
+			for (var i = 0; i < localStorage.length; i++) {
+				var keyName = localStorage.key(i);
+				if (keyName != 'idCount') {
+					var value = localStorage.getItem(keyName);
+					var record = JSON.parse(value);
+					$("<li data-id=" + keyName + ">" + record.fname + " " + record.lname + "</li>").appendTo($list);
+				}
+			}
+
+			displayButtons();
+		};
+
+		function displayButtons()
+		{
+			$("li").each(function(){
+				var $id = $(this).data('id')
+				$(this).append($("<button onclick='updateRecord(" + $id + ");'>update</button>"))
+						.append($("<button onclick='deleteName(" + $id + ");'>delete</button>"));
+			});
+		}
+
+		// function deleteName(id)
+		// {
+		// 	localStorage.removeItem(id);
+		// 	displayRecord();
+		// };
+
+		// function updateRecord(id)
+		// {
+		// 	$("#editform").show();
+		// 	var record = localStorage.getItem(id);
+		// 	var record = JSON.parse(record);
+		// 	$("#fnameUpdate").val(record.fname);
+		// 	$("#lnameUpdate").val(record.lname);
+
+		// 	$("form[name='recordedit']").on('click', 'BUTTON', function(){
+		// 		var $fnameUpdate = $("#fnameUpdate").val();
+		// 		var $lnameUpdate = $("#lnameUpdate").val();
+
+		// 		var record = {
+		// 		fname: $fnameUpdate,
+		// 		lname: $lnameUpdate,
+		// 		};
+		// 		localStorage.setItem(id, JSON.stringify(record));
+		// 	});
+		// };
+
+
+	</script>
+</head>
+<body>
+
+<div id="container">
+	<h1>Testing Web Storage</h1>
+	<h2>Enter name:</h2>
+	<form name="recordinput">
+		<label for="fname">First Name: </label>
+		<input type="text" id="fname"><br>
+		<label for="lname">Last Name: </label>
+		<input type="text" id="lname"><br>
+		<button type="submit">Create</button>
+	</form>
+
+
+	<h2>Saved names</h2>
+	<ul>
+	</ul>
+
+	<div id="editform">
+		<h2>update name:</h2>
+		<form name="recordedit">
+			<label for="fname">First Name: </label>
+			<input type="text" id="fnameUpdate"><br>
+			<label for="lname">Last Name: </label>
+			<input type="text" id="lnameUpdate"><br>
+			<button>save update</button>
+		</form>
+	</div>
+
+	<button onclick="resetStorage();">Reset</button>
+</div>
+
+</body>
+</html>
