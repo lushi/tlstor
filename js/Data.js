@@ -1,20 +1,13 @@
-var Data = function() {};
+var Data = function(fname, lname) {
+	if (fname || lname) this._createRecord(fname, lname);
+};
 
 Data.prototype = {
 
-	createRecord: function(fname, lname)
+	_createRecord: function(fname, lname)
 	{
-		var record = new Record();
-		record.populate(fname, lname);
-		record.id = index.hash(index.incrSeq());
-		if (index.checkInIndex(record.id)) {
-			throw new Error("The record already exists.");
-		} else {
-			record.write();
-			index.appendIndex(record.id);
-		}
-
-		return record;
+		var record = new Record(fname, lname);
+		index.appendIndex(record.id);
 	},
 
 	readRecord: function(id)
@@ -29,17 +22,14 @@ Data.prototype = {
 		return record;
 	},
 
-	updateRecord: function(id, fname, lname)
+	updateRecord: function(fname_new, lname_new, id)
 	{
 		var record = new Record();
 		if (index.checkInIndex(id)){
-			record.load(id);
-			record.populate(fname, lname);
-			record.write();
+			record.update(fname_new, lname_new, id);
 		} else {
 			throw new Error("Record not found.");
 		}
-
 		return record;
 	},
 
@@ -47,14 +37,11 @@ Data.prototype = {
 	{
 		var record = new Record();
 		if (index.checkInIndex(id)) {
-			record.load(id);
-			record.remove();
-			index.removeFromIndex(id);
+			record.remove(id);
+			index.deleteFromIndex(id);
 		} else {
 			throw new Error("Record not found.");
 		}
-
-		return record;
 	},
 
 	readAll: function()
