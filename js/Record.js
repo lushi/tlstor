@@ -50,20 +50,31 @@ Record.prototype = {
 
 	load: function(id) //retrieves record from localStorage based on id
 	{
-		this.id = id;
-		this.data = JSON.parse(localStorage.getItem(id));
+		if (this.id == null && this.data == null) {
+			this.id = id;
+			this.data = JSON.parse(localStorage.getItem(id));
+		}
+
 	},
 
 	update: function(fname_new, lname_new, id)
 	{
-		this.id = id;
-		this._populate(fname_new, lname_new);
-		this._write();
+		if (id) this.id = id;
+
+		if (this.id) {
+			this._populate(fname_new, lname_new);
+			this._write();
+		}
 	},
 
 	remove: function(id) //removes record from localStorage; record must be loaded first.
 	{
-		localStorage.removeItem(id);
+		if (id) {
+			localStorage.removeItem(id);
+		} else {
+			localStorage.removeItem(this.id);
+		}
+
 		this.id = null;
 		this.data = null;
 	}
